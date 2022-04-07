@@ -25,7 +25,7 @@ export class BooksController {
     this.client = ClientProxyFactory.create({
       transport: Transport.REDIS,
       options: {
-        url: 'redis://localhost:6379',
+        url: 'redis://redis:4000',
       },
     });
   }
@@ -49,7 +49,7 @@ export class BooksController {
     this.logger.log(createBookDTO);
     const book = await this.client.send<CreateBookDTO>(
       { cmd: 'addBook' },
-      createBookDTO,
+      createBookDTO
     );
     return book;
   }

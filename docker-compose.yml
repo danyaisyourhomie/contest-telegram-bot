@@ -1,9 +1,9 @@
 version: '3'
 services:
-  magazine-microservice:
-    container_name: magazine-microservice
+  bot-service:
+    container_name: bot-service
     build:
-      context: ./magazines-service/
+      context: ./bot-service/
     environment:
       - REDIS_HOST=redis
     ports:
@@ -11,10 +11,10 @@ services:
     depends_on:
       - redis
 
-  book-microservice:
-    container_name: book-microservice
+  auth-service:
+    container_name: auth-service
     build:
-      context: ./books-service/
+      context: ./auth-service/
     environment:
       - REDIS_HOST=redis
     ports:
@@ -22,11 +22,11 @@ services:
     depends_on:
       - redis
 
-  backend:
+  api_gateway:
     container_name: api_gateway
     build:
       dockerfile: Dockerfile
-      context: ./http-api
+      context: ./api-gateway
     command: npm run start:dev
     restart: always
     ports:
@@ -48,11 +48,32 @@ services:
       - '--bind'
       - redis
       - '--port'
-      - '6379'
+      - '4000'
     volumes:
       - 'redis_data:/usr/local/etc/redis/redis.conf'
     ports:
-      - '6379:6379'
+      - '4000:4000'
+
+  loki:
+    image: grafana/loki:2.4.0
+    container_name: loki
+    ports:
+      - '5100:5100'
+    command:
+      - --config.file=/mnt/config/loki-config.yml
+    volumes:
+      - ./loki-config.yml:/mnt/config/loki-config.yml:ro
+`
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - 3000:3000
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    # volumes:
+    #   - ./grafana/provisioning-datasources.yml:/etc/grafana/provisioning/datasources/provisioning-datasources.yml
 
 volumes:
   redis_data:

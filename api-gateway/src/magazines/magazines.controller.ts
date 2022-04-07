@@ -23,7 +23,7 @@ export class MagazinesController {
     this.client = ClientProxyFactory.create({
       transport: Transport.REDIS,
       options: {
-        url: 'redis://localhost:6379',
+        url: 'redis://redis:4000',
       },
     });
   }
@@ -47,7 +47,7 @@ export class MagazinesController {
     this.logger.log(createMagazineDTO);
     const magazine = await this.client.send<CreateMagazineDTO>(
       { cmd: 'addMagazine' },
-      createMagazineDTO,
+      createMagazineDTO
     );
     return magazine;
   }

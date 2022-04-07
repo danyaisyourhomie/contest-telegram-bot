@@ -1,5 +1,5 @@
 {
-  "name": "magazines-service",
+  "name": "api-gateway",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -27,7 +27,10 @@
     "redis": "^2.8.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",
-    "rxjs": "^6.5.3"
+    "rxjs": "^6.5.3",
+    "prom-client": "^12.0.0",
+    "winston": "^3.3.3",
+    "winston-loki": "6.0.0-rc.9"
   },
   "devDependencies": {
     "@nestjs/cli": "^6.9.0",

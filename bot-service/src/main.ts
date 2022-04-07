@@ -1,29 +1,25 @@
-import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Logger } from '@nestjs/common';
-import { BooksModule } from './books/books.module';
+import { NestFactory } from '@nestjs/core';
 import { Transport } from '@nestjs/microservices';
-
 // Create new logger instance
 const logger = new Logger('Main');
 
 // Create micro service options
 const microserviceOptions = {
-  name: 'BOOK_SERVICE',
+  name: 'MAGAZINE_SERVICE',
   transport: Transport.REDIS,
   options: {
-    url: 'redis://redis:6379',
+    url: 'redis://redis:4000',
   },
 };
 async function bootstrap() {
-  // const app = await NestFactory.create(AppModule);
-  // await app.listen(3000);
   const app = await NestFactory.createMicroservice(
     AppModule,
-    microserviceOptions,
+    microserviceOptions
   );
   app.listen(() => {
-    logger.log('Books microservice is listening ... ');
+    logger.log('Magazine microservice is listening ... ');
   });
 }
 bootstrap();
