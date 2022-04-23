@@ -1,69 +1,30 @@
-version: '3'
+version: "3"
 services:
   bot-service:
-    container_name: bot-service
+    container_name: bot
     build:
-      context: ./bot-service/
+      context: ./bot-service
+      target: development
     environment:
       - REDIS_HOST=redis
     ports:
-      - '3100:3000'
+      - "3100:3000"
     depends_on:
       - redis
-
-  auth-service:
-    container_name: auth-service
-    build:
-      context: ./auth-service/
-    environment:
-      - REDIS_HOST=redis
-    ports:
-      - '3200:3000'
-    depends_on:
-      - redis
-
-  api_gateway:
-    container_name: api_gateway
-    build:
-      dockerfile: Dockerfile
-      context: ./api-gateway
-    command: npm run start:dev
-    restart: always
-    ports:
-      - 3300:3000
-    depends_on:
-      - redis
-
-  redis:
-    image: 'redis:latest'
-    container_name: microservice-redis
-    restart: always
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-      - 'REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL'
-    labels:
-      kompose.service.type: nodeport
-    command:
-      - redis-server
-      - '--bind'
-      - redis
-      - '--port'
-      - '4000'
     volumes:
-      - 'redis_data:/usr/local/etc/redis/redis.conf'
-    ports:
-      - '4000:4000'
+      - ./api:/partnadem/src/bot
+      - ./partnadem/src/bot/node_modules
+    command: npm run start:dev
 
   loki:
     image: grafana/loki:2.4.0
     container_name: loki
     ports:
-      - '5100:5100'
+      - "5100:5100"
     command:
       - --config.file=/mnt/config/loki-config.yml
     volumes:
       - ./loki-config.yml:/mnt/config/loki-config.yml:ro
-`
   grafana:
     image: grafana/grafana:latest
     container_name: grafana

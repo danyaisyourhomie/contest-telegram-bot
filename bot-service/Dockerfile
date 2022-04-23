@@ -1,32 +1,24 @@
-#
-# ---- Base Node ----
+FROM node:14-alpine AS development
 
-FROM node:13-alpine AS base
+WORKDIR /partnadem/src/bot
 
-RUN apk add --no-cache tini
+COPY package*.json ./
 
-ENV appdir /server/
-RUN mkdir -p ${appdir}
-WORKDIR ${appdir}
-COPY package*.json ${appdir}
+RUN npm install
 
-#
-# ---- Dependencies ----
-FROM base AS dependencies
-# install node packages
-# RUN npm install -g @nestjs/cli
-RUN npm install 
-RUN npm install --only=dev
-# If you are building your code for production
-# RUN npm ci --only=production
-
-# ---- Build ----
-FROM dependencies AS build
 COPY . .
 
+RUN npm run build
 
-#
-# ---- Release ----
-FROM build AS release
-EXPOSE 3000
-CMD ["tini","npm", "run", "start"]
+FROM node:14-alpine AS production
+
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
+
+WORKDIR /partnadem/src/bot
+
+COPY --from=development /partnadem/src/bot/ .
+
+EXPOSE 8080
+
+CMD [ "node", "dist/main" ]
