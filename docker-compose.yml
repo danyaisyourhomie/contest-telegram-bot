@@ -4,38 +4,63 @@ services:
     container_name: bot
     build:
       context: ./bot-service
-      target: development
-    environment:
-      - REDIS_HOST=redis
+      dockerfile: Dockerfile.dev
     ports:
       - "3100:3000"
-    depends_on:
-      - redis
     volumes:
-      - ./api:/partnadem/src/bot
-      - ./partnadem/src/bot/node_modules
-    command: npm run start:dev
-
-  loki:
-    image: grafana/loki:2.4.0
-    container_name: loki
-    ports:
-      - "5100:5100"
-    command:
-      - --config.file=/mnt/config/loki-config.yml
-    volumes:
-      - ./loki-config.yml:/mnt/config/loki-config.yml:ro
-  grafana:
-    image: grafana/grafana:latest
-    container_name: grafana
-    ports:
-      - 3000:3000
+      - ./bot-service:/partnadem/src/bot
     environment:
-      - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
-    # volumes:
-    #   - ./grafana/provisioning-datasources.yml:/etc/grafana/provisioning/datasources/provisioning-datasources.yml
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: server
+    command: npm run start:dev
+    depends_on:
+      - postgres
 
-volumes:
-  redis_data:
-    driver: local
+  # loki:
+  #   image: grafana/loki:2.4.0
+  #   container_name: loki
+  #   ports:
+  #     - "5100:5100"
+  #   command:
+  #     - --config.file=/mnt/config/loki-config.yml
+  #   volumes:
+  #     - ./loki-config.yml:/mnt/config/loki-config.yml:ro
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   container_name: grafana
+  #   ports:
+  #     - 3000:3000
+  #   environment:
+  #     - GF_AUTH_ANONYMOUS_ENABLED=true
+  #     - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+  # volumes:
+  #   - ./grafana/provisioning-datasources.yml:/etc/grafana/provisioning/datasources/provisioning-datasources.yml
+
+  postgres:
+    container_name: postgres
+    image: postgres:10.4-alpine
+    ports:
+      - 5433:5432
+    volumes:
+      - ./data_store/postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: partnadem
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: db
+    restart: always
+
+  pg_admin:
+    container_name: pgadmin
+    image: dpage/pgadmin4:4.28
+    depends_on:
+      - postgres
+    ports:
+      - 5440:80
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: core2pixel@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    user: root
+    volumes:
+      - ./data_store/pgadmin-data:/var/lib/pgadmin
