@@ -1,13 +1,14 @@
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { AuthModule } from './../../api/src/auth/auth.module';
-import { AuthService } from './../../api/src/auth/auth.service';
-import { MagazinesModule } from './magazines/magazines.module';
-import { Module } from '@nestjs/common';
+import { EchoModule } from "./echo/echo.module";
+import { Module } from "@nestjs/common";
+import { TelegrafModule } from "nestjs-telegraf";
 
 @Module({
-  imports: [AuthModule, MagazinesModule],
-  controllers: [AppController],
-  providers: [AuthService, AppService],
+  imports: [
+    TelegrafModule.forRoot({
+      token: process.env.ECHO_BOT_TOKEN,
+      include: [EchoModule],
+    }),
+    EchoModule,
+  ],
 })
 export class AppModule {}
