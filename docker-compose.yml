@@ -17,25 +17,25 @@ services:
     depends_on:
       - postgres
 
-  # loki:
-  #   image: grafana/loki:2.4.0
-  #   container_name: loki
-  #   ports:
-  #     - "5100:5100"
-  #   command:
-  #     - --config.file=/mnt/config/loki-config.yml
-  #   volumes:
-  #     - ./loki-config.yml:/mnt/config/loki-config.yml:ro
-  # grafana:
-  #   image: grafana/grafana:latest
-  #   container_name: grafana
-  #   ports:
-  #     - 3000:3000
-  #   environment:
-  #     - GF_AUTH_ANONYMOUS_ENABLED=true
-  #     - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
-  # volumes:
-  #   - ./grafana/provisioning-datasources.yml:/etc/grafana/provisioning/datasources/provisioning-datasources.yml
+  loki:
+    image: grafana/loki:2.4.0
+    container_name: loki
+    ports:
+      - "5100:5100"
+    command:
+      - --config.file=/mnt/config/loki-config.yml
+    volumes:
+      - ./loki-config.yml:/mnt/config/loki-config.yml:ro
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - 3000:3000
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+  volumes:
+    - ./grafana/provisioning-datasources.yml:/etc/grafana/provisioning/datasources/provisioning-datasources.yml
 
   postgres:
     container_name: postgres

@@ -1,5 +1,5 @@
-import { EchoService } from "./echo.service";
-import { EchoUpdate } from "./echo.update";
+import { EchoService } from "./auth.service";
+import { EchoUpdate } from "./auth.update";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "entities/user.entity";

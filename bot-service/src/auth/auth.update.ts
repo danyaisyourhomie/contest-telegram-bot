@@ -6,7 +6,7 @@ import { ResponseTimeInterceptor } from "../common/interceptors/response-time.in
 import { TelegrafExceptionFilter } from "../common/filters/telegraf-exception.filter";
 import { DEV_BOT } from "const";
 import { confirmRealmKeyboard, sigInKeyboard } from "common/keyboards";
-import { EchoService } from "./echo.service";
+import { EchoService } from "./auth.service";
 import { BOT_ACTIONS_TYPE } from "common/actions";
 import { Repository } from "typeorm";
 import { User, USER_REALM } from "entities/user.entity";

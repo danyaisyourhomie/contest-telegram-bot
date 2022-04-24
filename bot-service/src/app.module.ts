@@ -1,6 +1,7 @@
 import { DEV_BOT } from "const";
-import { EchoModule } from "./echo/echo.module";
+import { EchoModule } from "./auth/auth.module";
 import { Module } from "@nestjs/common";
+import { RestModule } from "./rest/rest.module";
 import { TelegrafModule } from "nestjs-telegraf";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "entities/user.entity";
@@ -8,6 +9,7 @@ import { sessionMiddleware } from "middleware/session.middleware";
 
 @Module({
   imports: [
+    RestModule,
     EchoModule,
     TelegrafModule.forRootAsync({
       botName: DEV_BOT,
