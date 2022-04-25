@@ -21,9 +21,9 @@ services:
     ports:
       - "5100:5100"
     command:
-      - --config.file= /tmp/loki/config.yaml
+      - --config.file=/tmp/loki/config.yml
     volumes:
-      - ./loki/config.yml:/tmp/loki/config.yaml
+      - ./loki/config.yml:/tmp/loki/config.yml
       - /data/loki:/tmp/loki/
     networks:
       - server-net
