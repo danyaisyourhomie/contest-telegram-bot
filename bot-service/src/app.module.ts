@@ -8,6 +8,18 @@ import { User } from "entities/user.entity";
 import { UserModule } from "./user/user.module";
 import { sessionMiddleware } from "middleware/session.middleware";
 
+const {
+  DEV_TELEGRAM_BOT,
+  POSTGRES_USER,
+  POSTGRES_PASSWORD,
+  POSTGRES_DB,
+  PORT,
+  MODE,
+  POSTGRES_HOST,
+} = process.env;
+
+console.log(PORT, MODE, POSTGRES_HOST);
+
 @Module({
   imports: [
     UserModule,
@@ -16,18 +28,18 @@ import { sessionMiddleware } from "middleware/session.middleware";
     TelegrafModule.forRootAsync({
       botName: DEV_BOT,
       useFactory: () => ({
-        token: process.env.DEV_TELEGRAM_BOT,
+        token: DEV_TELEGRAM_BOT,
         middlewares: [sessionMiddleware],
         include: [EchoModule],
       }),
     }),
     TypeOrmModule.forRoot({
       type: "postgres",
-      host: "postgres",
-      port: 5433,
-      username: "partnadem",
-      password: "mysecretpassword",
-      database: "db",
+      host: POSTGRES_HOST,
+      port: PORT,
+      username: POSTGRES_USER,
+      password: POSTGRES_PASSWORD,
+      database: POSTGRES_DB,
       entities: [User],
       synchronize: true,
     }),
