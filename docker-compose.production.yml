@@ -25,6 +25,8 @@ services:
     volumes:
       - ./loki/config.yml:/home/loki/config.yaml
       - ./loki:/data/loki
+    networks:
+      - server-net
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
@@ -36,6 +38,8 @@ services:
     volumes:
       # - /home/grafana:/var/lib/grafana
       - ./grafana.ini:/etc/grafana/grafana.ini
+    networks:
+      - server-net
 
   postgres:
     container_name: postgres
