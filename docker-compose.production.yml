@@ -4,13 +4,9 @@ services:
     container_name: bot
     build:
       context: ./bot-service
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     ports:
       - "3100:3000"
-    environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: server
     command: npm run start
     depends_on:
       - postgres

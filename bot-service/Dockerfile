@@ -1,4 +1,3 @@
-#
 # ---- Base Node ----
 
 FROM node:13-alpine AS base
@@ -11,18 +10,16 @@ WORKDIR ${appdir}
 COPY package.json ${appdir}
 COPY package-lock.json ${appdir}
 
-#
 # ---- Dependencies ----
 FROM base AS dependencies
 RUN npm install -g @nestjs/cli
-RUN npm ci --only=production
+RUN npm install 
+RUN npm install --only=dev
 
 # ---- Build ----
 FROM dependencies AS build
 COPY . .
 
-
-#
 # ---- Release ----
 FROM build AS release
 EXPOSE 3000
