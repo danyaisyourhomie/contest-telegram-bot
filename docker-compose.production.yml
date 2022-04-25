@@ -34,7 +34,7 @@ services:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
     volumes:
-      - /home/grafana:/var/lib/grafana
+      # - /home/grafana:/var/lib/grafana
       - ./grafana.ini:/etc/grafana/grafana.ini
 
   postgres:
