@@ -3,7 +3,10 @@ import { LOGGER_JOBS, LOG_LABELS } from "const";
 const { createLogger, transports, format } = require("winston");
 const LokiTransport = require("winston-loki");
 
-const LOGGER_HOST = "http://localhost:5100";
+const { MODE } = process.env;
+
+const LOGGER_HOST =
+  MODE === "production" ? "http://loki:5100" : "http://localhost:5100";
 
 const APP_LABEL = "app";
 
