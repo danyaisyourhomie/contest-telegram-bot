@@ -60,6 +60,17 @@ export class BotUpdate {
   async sendTicket(@Ctx() ctx: Context) {
     const { id: userId } = ctx.from;
 
+    const user = await this.userService.getUser(userId);
+
+    if (!user) {
+      await this.send(
+        userId,
+        "Вы не зарегистрировались. Выполните команду /start."
+      );
+
+      return;
+    }
+
     const ticket = await this.getTicket(userId);
 
     await this.bot.telegram.sendPhoto(userId, ticket);

@@ -19,14 +19,6 @@ const {
   PG_PORT,
 } = process.env;
 
-console.log(
-  PG_PORT,
-  POSTGRES_USER,
-  POSTGRES_HOST,
-  POSTGRES_PASSWORD,
-  POSTGRES_DB
-);
-
 @Module({
   imports: [
     UserModule,

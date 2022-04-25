@@ -3,10 +3,7 @@ import { LOGGER_JOBS, LOG_LABELS } from "const";
 const { createLogger, transports, format } = require("winston");
 const LokiTransport = require("winston-loki");
 
-const { MODE } = process.env;
-
-const LOGGER_HOST =
-  MODE === "production" ? "http://loki:5100" : "http://localhost:5100";
+const { MODE, LOKI_HOST } = process.env;
 
 const APP_LABEL = "app";
 
@@ -23,7 +20,7 @@ function initLogger(tag: LOGGER_JOBS) {
     format: format.combine(format.splat()),
     transports: [
       new LokiTransport({
-        host: LOGGER_HOST,
+        host: LOKI_HOST,
         labels: {
           service: tag,
           app: APP_LABEL,

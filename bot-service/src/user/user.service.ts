@@ -11,7 +11,7 @@ import { Repository } from "typeorm";
 export class UserService {
   constructor(@InjectRepository(User) private readonly rep: Repository<User>) {}
 
-  async getUser(tg_id: number): Promise<User> {
+  async getUser(tg_id: number): Promise<User | null> {
     return this.rep.findOne({ tg_id });
   }
 
