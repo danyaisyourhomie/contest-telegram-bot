@@ -210,7 +210,7 @@ export class BotUpdate {
       botLogger.info({
         message: `Зарегистрировался`,
         userData,
-        labels: getUserLogLabel(userData.id, LOG_LABELS.USER_ACTION),
+        labels: getUserLogLabel(userData.id, LOG_LABELS.USER_REGISTRATION),
       });
 
       this.getUserRealm(savedUser);

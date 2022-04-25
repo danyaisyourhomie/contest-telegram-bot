@@ -21,6 +21,7 @@ export enum LOG_LABELS {
   VALIDATE_TICKET = "validate-ticket",
   CHECKED_TICKET = "success-ticket",
   EARLY_TICKET = "early-ticket",
+  USER_REGISTRATION = "user-registration",
 }
 
 const QRCODE_BGCOLOR = "C0CED8";
