@@ -1,0 +1,67 @@
+version: "3"
+services:
+  bot-service:
+    container_name: bot
+    build:
+      context: ./bot-service
+      dockerfile: Dockerfile
+    ports:
+      - "3100:3000"
+    volumes:
+      - ./bot-service:/partnadem/src/bot
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: server
+    command: npm run start
+    depends_on:
+      - postgres
+
+  loki:
+    image: grafana/loki:2.4.0
+    container_name: loki
+    ports:
+      - "5100:5100"
+    command:
+      - --config.file=/etc/loki/config.yaml
+    volumes:
+      - ./loki/config.yml:/etc/loki/config.yaml
+      - ./loki:/data/loki
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - 3000:3000
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    # volumes:
+    #   - ./grafana/provisioning-datasources.yml:/etc/grafana/provisioning/datasources/provisioning-datasources.yml
+
+  postgres:
+    container_name: postgres
+    image: postgres:10.4-alpine
+    ports:
+      - 5433:5432
+    volumes:
+      - ./data_store/postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: partnadem
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: db
+    restart: always
+
+  pg_admin:
+    container_name: pgadmin
+    image: dpage/pgadmin4:4.28
+    depends_on:
+      - postgres
+    ports:
+      - 5440:80
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: core2pixel@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    user: root
+    volumes:
+      - ./data_store/pgadmin-data:/var/lib/pgadmin
