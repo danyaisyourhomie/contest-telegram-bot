@@ -19,7 +19,7 @@ jobs:
       - name: Pull latest services
         run: docker-compose -f docker-compose.production.yml pull
       - name: Build services
-        run: docker-compose -f docker-compose.production.yml build
+        run: docker-compose -f docker-compose.production.yml build --no-cache
       - name: Run services
         run: docker-compose -f docker-compose.production.yml up -d
       - name: Status
