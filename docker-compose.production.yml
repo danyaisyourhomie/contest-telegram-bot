@@ -24,7 +24,7 @@ services:
       - --config.file=/home/loki/config.yaml
     volumes:
       - ./loki/config.yml:/home/loki/config.yaml
-      - /home/loki/:/data/loki
+      - /home/loki/:/tmp/loki
     networks:
       - server-net
   grafana:
@@ -36,8 +36,8 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=mynewpassword
       - GF_SECURITY_ADMIN_USER=partnadem
     volumes:
-      # - /home/grafana:/var/lib/grafana
-      - ./grafana.ini:/etc/grafana/grafana.ini
+      - grafana-storage:/var/lib/grafana
+        - ./grafana.ini:/etc/grafana/grafana.ini
     networks:
       - server-net
 
@@ -76,3 +76,7 @@ services:
 networks:
   server-net:
     driver: bridge
+
+volumes:
+  grafana-storage:
+    external: true
