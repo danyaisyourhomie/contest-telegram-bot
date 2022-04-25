@@ -24,7 +24,7 @@ services:
       - --config.file=/home/loki/config.yaml
     volumes:
       - ./loki/config.yml:/home/loki/config.yaml
-      - ./loki:/data/loki
+      - /home/loki/:/data/loki
     networks:
       - server-net
   grafana:
@@ -38,6 +38,7 @@ services:
     volumes:
       # - /home/grafana:/var/lib/grafana
       - ./grafana.ini:/etc/grafana/grafana.ini
+      - /home/grafana:/var/lib/grafana
     networks:
       - server-net
 
