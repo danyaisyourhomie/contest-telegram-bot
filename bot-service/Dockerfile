@@ -14,7 +14,7 @@ COPY package-lock.json ${appdir}
 #
 # ---- Dependencies ----
 FROM base AS dependencies
-
+RUN npm install -g @nestjs/cli
 RUN npm ci --only=production
 
 # ---- Build ----
