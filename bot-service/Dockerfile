@@ -9,7 +9,7 @@ ENV appdir /partnadem/src/bot
 RUN mkdir -p ${appdir}
 WORKDIR ${appdir}
 COPY package.json ${appdir}
-COPY package.json ${appdir}
+COPY package-lock.json ${appdir}
 
 #
 # ---- Dependencies ----
