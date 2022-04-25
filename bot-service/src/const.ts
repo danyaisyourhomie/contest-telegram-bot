@@ -24,7 +24,7 @@ export enum LOG_LABELS {
   USER_REGISTRATION = "user-registration",
 }
 
-const QRCODE_BGCOLOR = "C0CED8";
+const QRCODE_BGCOLOR = "71868F";
 const QRCODE_COLOR = "FFFFFF";
 
 export const QRCODE_SERVICE_API = (data: string, size?: string) =>
