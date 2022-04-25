@@ -37,7 +37,7 @@ services:
       - GF_SECURITY_ADMIN_USER=partnadem
     volumes:
       - grafana-storage:/var/lib/grafana
-        - ./grafana.ini:/etc/grafana/grafana.ini
+      - ./grafana.ini:/etc/grafana/grafana.ini
     networks:
       - server-net
 
