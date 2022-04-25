@@ -24,7 +24,7 @@ services:
       - --config.file=/loki/config.yaml
     volumes:
       - ./loki/config.yml:/loki/config.yaml
-      - /data/loki:/loki
+      # - /data/loki:/loki
     networks:
       - server-net
   grafana:
