@@ -23,8 +23,8 @@ services:
     command:
       - --config.file=/home/loki/config.yaml
     volumes:
-      - ./loki/config.yml:/home/loki/config.yaml
-      - /home/loki/:/tmp/loki
+      - ./loki/config.yml:/etc/loki/config.yaml
+      - /data/loki:/loki
     networks:
       - server-net
   grafana:
