@@ -7,8 +7,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3100:3000"
-    volumes:
-      - ./bot-service:/partnadem/src/bot
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: password
@@ -25,8 +23,8 @@ services:
     command:
       - --config.file=/etc/loki/config.yaml
     volumes:
-      - /home/loki/config.yml:/etc/loki/config.yaml
-      - /home/loki:/data/loki
+      - /etc/loki/config.yml:/etc/loki/config.yaml
+      - /etc/loki:/data/loki
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
@@ -36,7 +34,7 @@ services:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
     volumes:
-      - /home/grafana:/var/lib/grafana
+      - /etc/grafana:/var/lib/grafana
       - ./grafana.ini:/etc/grafana/grafana.ini
 
   postgres:
