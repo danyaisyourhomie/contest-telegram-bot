@@ -36,7 +36,7 @@ console.log(PORT, MODE, POSTGRES_HOST);
     TypeOrmModule.forRoot({
       type: "postgres",
       host: POSTGRES_HOST,
-      port: PORT,
+      port: PORT as unknown as number,
       username: POSTGRES_USER,
       password: POSTGRES_PASSWORD,
       database: POSTGRES_DB,
