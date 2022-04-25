@@ -9,10 +9,6 @@ services:
       - "3100:3000"
     volumes:
       - ./bot-service:/partnadem/src/bot
-    environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: server
     command: npm run start:dev
     depends_on:
       - postgres

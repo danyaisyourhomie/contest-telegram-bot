@@ -19,8 +19,6 @@ const {
   PG_PORT,
 } = process.env;
 
-console.log(PORT, MODE, POSTGRES_HOST);
-
 @Module({
   imports: [
     UserModule,
@@ -36,7 +34,7 @@ console.log(PORT, MODE, POSTGRES_HOST);
     }),
     TypeOrmModule.forRoot({
       type: "postgres",
-      host: POSTGRES_HOST,
+      host: MODE === "production" ? "host.docker.internal" : "localhost",
       port: PG_PORT as unknown as number,
       username: POSTGRES_USER,
       password: POSTGRES_PASSWORD,
