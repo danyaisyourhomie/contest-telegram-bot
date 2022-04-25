@@ -12,6 +12,8 @@ services:
       - postgres
     volumes:
       - /home/.env:/partnadem/src/bot/.env
+    networks:
+      - server-net
 
   loki:
     image: grafana/loki:2.4.0
@@ -47,6 +49,8 @@ services:
       POSTGRES_PASSWORD: mysecretpassword
       POSTGRES_DB: db
     restart: always
+    networks:
+      - server-net
 
   pg_admin:
     container_name: pgadmin
@@ -62,3 +66,7 @@ services:
     user: root
     volumes:
       - /home/data_store/pgadmin-data:/var/lib/pgadmin
+
+networks:
+  server-net:
+    driver: bridge
