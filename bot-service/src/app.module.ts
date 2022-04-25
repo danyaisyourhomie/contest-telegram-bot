@@ -23,7 +23,7 @@ import { sessionMiddleware } from "middleware/session.middleware";
     }),
     TypeOrmModule.forRoot({
       type: "postgres",
-      host: "localhost",
+      host: process.env.production === "production" ? "postgres" : "localhost",
       port: 5433,
       username: "partnadem",
       password: "mysecretpassword",
