@@ -5,10 +5,9 @@ FROM node:13-alpine AS base
 
 RUN apk add --no-cache tini
 
-ENV appdir /partnadem/src/bot
-RUN mkdir -p ${appdir}
-WORKDIR ${appdir}
-COPY package*.json ${appdir}
+WORKDIR  /partnadem/src/bot
+COPY package.json .
+COPY package-lock.json .
 
 #
 # ---- Dependencies ----
