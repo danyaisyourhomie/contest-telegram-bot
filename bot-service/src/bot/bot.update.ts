@@ -26,7 +26,7 @@ import { User, USER_REALM } from "entities/user.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { UserService } from "user/user.service";
 
-const { botLogger, getUserLogLabel } = require("../logger");
+const { botLogger, getUserLogLabel, ticketLogger } = require("../logger");
 
 const jwt = require("jsonwebtoken");
 
@@ -53,6 +53,11 @@ export class BotUpdate {
   async getTicket(userId: number) {
     const token = jwt.sign(userId, process.env.JWT_TOKEN);
 
+    ticketLogger.info({
+      message: `Билет создан`,
+      labels: getUserLogLabel(userId, LOG_LABELS.CREATE_TICKET),
+    });
+
     return QRCODE_SERVICE_API(QRCODE_VALIDATION_SERVICE_HOST + token);
   }
 
@@ -68,10 +73,20 @@ export class BotUpdate {
         "Вы не зарегистрировались. Выполните команду /start."
       );
 
+      botLogger.info({
+        message: "Попытался получить билет без регистрации",
+        labels: getUserLogLabel(userId, LOG_LABELS.EARLY_TICKET),
+      });
+
       return;
     }
 
     const ticket = await this.getTicket(userId);
+
+    ticketLogger.info({
+      message: `Получил билет`,
+      labels: getUserLogLabel(userId, LOG_LABELS.SEND_TICKET),
+    });
 
     await this.bot.telegram.sendPhoto(userId, ticket);
   }

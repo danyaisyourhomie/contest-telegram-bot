@@ -17,8 +17,10 @@ export enum LOG_LABELS {
   GET_USER = "get-user",
   PING_SERVICE = "ping-service",
   CREATE_TICKET = "create-ticket",
+  SEND_TICKET = "send-ticket",
   VALIDATE_TICKET = "validate-ticket",
   CHECKED_TICKET = "success-ticket",
+  EARLY_TICKET = "early-ticket",
 }
 
 const QRCODE_BGCOLOR = "C0CED8";
