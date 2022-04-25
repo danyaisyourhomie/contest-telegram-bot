@@ -1,14 +1,16 @@
 import { DEV_BOT } from "const";
-import { EchoModule } from "./auth/auth.module";
+import { EchoModule } from "./bot/bot.module";
 import { Module } from "@nestjs/common";
 import { RestModule } from "./rest/rest.module";
 import { TelegrafModule } from "nestjs-telegraf";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "entities/user.entity";
+import { UserModule } from "./user/user.module";
 import { sessionMiddleware } from "middleware/session.middleware";
 
 @Module({
   imports: [
+    UserModule,
     RestModule,
     EchoModule,
     TelegrafModule.forRootAsync({

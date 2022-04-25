@@ -26,7 +26,7 @@ export class RestService {
       jwt.sign({ tg_id }, process.env.JWT_TOKEN),
       {
         type: "png",
-        width: 200,
+        width: 512,
         errorCorrectionLevel: "H",
       }
     );

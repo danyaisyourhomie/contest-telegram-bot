@@ -23,9 +23,10 @@ services:
     ports:
       - "5100:5100"
     command:
-      - --config.file=/mnt/config/loki-config.yml
+      - --config.file=/etc/loki/config.yaml
     volumes:
-      - ./loki-config.yml:/mnt/config/loki-config.yml:ro
+      - ./loki/config.yml:/etc/loki/config.yaml
+      - ./loki:/data/loki
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
@@ -34,8 +35,8 @@ services:
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
-  volumes:
-    - ./grafana/provisioning-datasources.yml:/etc/grafana/provisioning/datasources/provisioning-datasources.yml
+    # volumes:
+    #   - ./grafana/provisioning-datasources.yml:/etc/grafana/provisioning/datasources/provisioning-datasources.yml
 
   postgres:
     container_name: postgres
