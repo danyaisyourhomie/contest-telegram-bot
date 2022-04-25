@@ -25,8 +25,8 @@ services:
     command:
       - --config.file=/etc/loki/config.yaml
     volumes:
-      - ./loki/config.yml:/etc/loki/config.yaml
-      - ./loki:/data/loki
+      - /home/loki/config.yml:/etc/loki/config.yaml
+      - /home/loki:/data/loki
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
@@ -36,8 +36,8 @@ services:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
     volumes:
-      - ./grafana:/var/lib/grafana
-      - ./grafana.ini:/etc/grafana/grafana.ini:ro
+      - /home/grafana:/var/lib/grafana
+      - /home/grafana.ini:/etc/grafana/grafana.ini:ro
 
   postgres:
     container_name: postgres
@@ -45,7 +45,7 @@ services:
     ports:
       - 5433:5432
     volumes:
-      - ./data_store/postgres-data:/var/lib/postgresql/data
+      - /home/data_store/postgres-data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: partnadem
       POSTGRES_PASSWORD: mysecretpassword
@@ -65,4 +65,4 @@ services:
       PGADMIN_DEFAULT_PASSWORD: password
     user: root
     volumes:
-      - ./data_store/pgadmin-data:/var/lib/pgadmin
+      - /home/data_store/pgadmin-data:/var/lib/pgadmin
