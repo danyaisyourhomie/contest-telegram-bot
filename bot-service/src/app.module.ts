@@ -16,6 +16,7 @@ const {
   PORT,
   MODE,
   POSTGRES_HOST,
+  PG_PORT,
 } = process.env;
 
 console.log(PORT, MODE, POSTGRES_HOST);
@@ -36,7 +37,7 @@ console.log(PORT, MODE, POSTGRES_HOST);
     TypeOrmModule.forRoot({
       type: "postgres",
       host: POSTGRES_HOST,
-      port: PORT as unknown as number,
+      port: PG_PORT as unknown as number,
       username: POSTGRES_USER,
       password: POSTGRES_PASSWORD,
       database: POSTGRES_DB,

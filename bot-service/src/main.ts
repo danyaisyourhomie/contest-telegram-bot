@@ -8,6 +8,6 @@ async function bootstrap() {
   //  await NestFactory.createApplicationContext(AppModule);
 
   const bot = await NestFactory.create(AppModule);
-  bot.listen("4000");
+  bot.listen(process.env.PORT);
 }
 bootstrap();
