@@ -38,7 +38,6 @@ services:
     volumes:
       # - /home/grafana:/var/lib/grafana
       - ./grafana.ini:/etc/grafana/grafana.ini
-      - grafana:/var/lib/grafana
     networks:
       - server-net
 
