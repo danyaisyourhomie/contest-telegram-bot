@@ -7,7 +7,6 @@ import {
   Update,
   Ctx,
   Command,
-  Action,
 } from "nestjs-telegraf";
 import { Telegraf } from "telegraf";
 import { Context } from "../interfaces/context.interface";
@@ -21,9 +20,7 @@ import {
 } from "const";
 import { confirmRealmKeyboard, sigInKeyboard } from "common/keyboards";
 import { BOT_ACTIONS_TYPE } from "common/actions";
-import { Repository } from "typeorm";
 import { User, USER_REALM } from "entities/user.entity";
-import { InjectRepository } from "@nestjs/typeorm";
 import { UserService } from "user/user.service";
 
 const { botLogger, getUserLogLabel, ticketLogger } = require("../logger");
@@ -37,8 +34,7 @@ export class BotUpdate {
   constructor(
     @InjectBot(DEV_BOT)
     private readonly bot: Telegraf<Context>,
-    private readonly userService: UserService,
-    @InjectRepository(User) private readonly userRepository: Repository<User>
+    private readonly userService: UserService
   ) {}
 
   @On("callback_query")
@@ -51,14 +47,24 @@ export class BotUpdate {
   }
 
   async getTicket(userId: number) {
-    const token = jwt.sign(userId, process.env.JWT_TOKEN);
+    try {
+      const token = jwt.sign(userId, process.env.JWT_TOKEN);
 
-    ticketLogger.info({
-      message: `Билет создан`,
-      labels: getUserLogLabel(userId, LOG_LABELS.CREATE_TICKET),
-    });
+      ticketLogger.info({
+        message: `Билет создан`,
+        labels: getUserLogLabel(userId, LOG_LABELS.CREATE_TICKET),
+        token,
+      });
 
-    return QRCODE_SERVICE_API(QRCODE_VALIDATION_SERVICE_HOST + token);
+      return await QRCODE_SERVICE_API(QRCODE_VALIDATION_SERVICE_HOST + token);
+    } catch (err) {
+      console.log(err);
+
+      ticketLogger.warn({
+        message: `Билет не был создан`,
+        labels: getUserLogLabel(userId, LOG_LABELS.CREATE_TICKET),
+      });
+    }
   }
 
   @Command("ticket")
@@ -81,14 +87,28 @@ export class BotUpdate {
       return;
     }
 
-    const ticket = await this.getTicket(userId);
+    try {
+      const ticket = await this.getTicket(userId);
 
-    ticketLogger.info({
-      message: `Получил билет`,
-      labels: getUserLogLabel(userId, LOG_LABELS.SEND_TICKET),
-    });
+      await this.bot.telegram.sendPhoto(userId, ticket);
 
-    await this.bot.telegram.sendPhoto(userId, ticket);
+      ticketLogger.info({
+        message: `Получил билет`,
+        labels: getUserLogLabel(userId, LOG_LABELS.SEND_TICKET),
+      });
+    } catch (err) {
+      console.log(err);
+
+      await this.bot.telegram.sendMessage(
+        userId,
+        "Упс, не получилось сгенерировать для вас билет. Попробуйте ещё раз через некоторое время. Для получения помощи напишите @partnadem."
+      );
+
+      ticketLogger.warn({
+        message: `Не смог получить билет`,
+        labels: getUserLogLabel(userId, LOG_LABELS.SEND_TICKET),
+      });
+    }
   }
 
   @Start()
@@ -197,7 +217,7 @@ export class BotUpdate {
         return;
       }
 
-      const savedUser = await this.userService.updateUser(userData.id, {
+      const savedUser = await this.userService.saveUser(userData.id, {
         ...userData,
         realm: USER_REALM.NOT_STATED,
       });
@@ -240,9 +260,7 @@ export class BotUpdate {
       labels: getUserLogLabel(userData.id, LOG_LABELS.BOT_ACTION),
     });
 
-    const user = await this.userRepository.findOne({
-      where: { tg_id: userData.id },
-    });
+    const user = await this.userService.getUser(userData.id);
 
     if (!user) {
       botLogger.warn({
@@ -257,10 +275,9 @@ export class BotUpdate {
       );
     }
 
-    await this.userRepository.update(
-      { tg_id: userData.id },
-      { realm: callback_data.realm }
-    );
+    await this.userService.updateUser(userData.id, {
+      realm: callback_data.realm,
+    });
 
     botLogger.info({
       message: `Пользователь обновил университет`,

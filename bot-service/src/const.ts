@@ -27,10 +27,11 @@ export enum LOG_LABELS {
 const QRCODE_BGCOLOR = "71868F";
 const QRCODE_COLOR = "FFFFFF";
 
-export const QRCODE_SERVICE_API = (data: string, size?: string) =>
-  `http://api.qrserver.com/v1/create-qr-code/?data=${data}&size=${
+export const QRCODE_SERVICE_API = (data: string, size?: string) => {
+  return `http://api.qrserver.com/v1/create-qr-code/?data=${data}&size=${
     size ?? "256x256"
   }&margin=25&bgcolor=${QRCODE_BGCOLOR}&color=${QRCODE_COLOR}`;
+};
 
 export const QRCODE_VALIDATION_SERVICE_HOST =
   "https://misster.partnadem.com/validate/?token=";

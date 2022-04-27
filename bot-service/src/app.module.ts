@@ -6,6 +6,7 @@ import { TelegrafModule } from "nestjs-telegraf";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "entities/user.entity";
 import { UserModule } from "./user/user.module";
+import { UserV2 } from "entities/userv2.entity";
 import { sessionMiddleware } from "middleware/session.middleware";
 
 const {
@@ -39,7 +40,7 @@ const {
       username: POSTGRES_USER,
       password: POSTGRES_PASSWORD,
       database: POSTGRES_DB,
-      entities: [User],
+      entities: [User, UserV2],
       synchronize: true,
     }),
   ],

@@ -10,7 +10,7 @@ export enum USER_REALM {
 
 @Entity()
 export class User extends BaseEntity {
-  @Column({ unique: true })
+  @Column({ nullable: true })
   tg_id: number;
 
   @Column({ nullable: true })
