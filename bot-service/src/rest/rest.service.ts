@@ -4,6 +4,7 @@ https://docs.nestjs.com/providers#services
 
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { QRCODE_VALIDATION_SERVICE_HOST } from "const";
 import { User } from "entities/user.entity";
 import { Repository } from "typeorm";
 
@@ -21,14 +22,18 @@ export class RestService {
   }
 
   async getQRCode(tg_id: number, stream) {
-    await QRCode.toFileStream(
+    const token = jwt.sign(tg_id, process.env.JWT_TOKEN);
+
+    const code = await QRCode.toFileStream(
       stream,
-      jwt.sign({ tg_id }, process.env.JWT_TOKEN),
+      QRCODE_VALIDATION_SERVICE_HOST + token,
       {
         type: "png",
         width: 512,
         errorCorrectionLevel: "H",
       }
     );
+
+    return code;
   }
 }
