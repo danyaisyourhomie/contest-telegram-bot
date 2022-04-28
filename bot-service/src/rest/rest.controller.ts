@@ -61,12 +61,9 @@ export class RestController {
         token,
         labels: { ...getRestLogLabel(LOG_LABELS.CREATE_TICKET) },
       });
-      const data: { tg_id: number } = await jwt.verify(
-        token,
-        process.env.JWT_TOKEN
-      );
+      const tg_id: number = await jwt.verify(token, process.env.JWT_TOKEN);
 
-      const user = await this.restService.getUser(data.tg_id);
+      const user = await this.restService.getUser(tg_id);
 
       ticketLogger.info({
         message: "Билет прошёл проверку",
