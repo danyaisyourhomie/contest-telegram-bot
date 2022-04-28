@@ -18,7 +18,11 @@ import {
   QRCODE_SERVICE_API,
   QRCODE_VALIDATION_SERVICE_HOST,
 } from "const";
-import { confirmRealmKeyboard, sigInKeyboard } from "common/keyboards";
+import {
+  confirmLevel,
+  confirmRealmKeyboard,
+  sigInKeyboard,
+} from "common/keyboards";
 import { BOT_ACTIONS_TYPE } from "common/actions";
 import { User, USER_REALM } from "entities/user.entity";
 import { UserService } from "user/user.service";
@@ -26,6 +30,14 @@ import { UserService } from "user/user.service";
 const { botLogger, getUserLogLabel, ticketLogger } = require("../logger");
 
 const jwt = require("jsonwebtoken");
+
+const bannedIdsForLevels = [];
+
+const levels = {
+  0: "Сонный паралич",
+  1: "Онейроидный синдром",
+  2: "Гипнотический транс",
+};
 
 @Update()
 @UseInterceptors(ResponseTimeInterceptor)
@@ -65,6 +77,33 @@ export class BotUpdate {
         labels: getUserLogLabel(userId, LOG_LABELS.CREATE_TICKET),
       });
     }
+  }
+
+  @Command("nextLevel")
+  async chooseLevel(@Ctx() ctx: Context) {
+    const { id } = ctx.from;
+
+    await this.send(id, `Выберите синдром:`, {
+      parse_mode: "HTML",
+      reply_markup: confirmLevel.reply_markup,
+    });
+  }
+
+  async confirmNextLevel(@Ctx() ctx: Context, userId, { level }) {
+    if (bannedIdsForLevels.includes(userId)) {
+      this.send(userId, "Вы уже сделали свой выбор.");
+      return;
+    }
+
+    const nextLevel = levels[level || 0] || levels[0];
+
+    bannedIdsForLevels.push(userId);
+    this.send(userId, `Вы выбрали "${nextLevel}".`);
+
+    ticketLogger.info({
+      message: `Выбрал следующий уровень: ${nextLevel}`,
+      labels: getUserLogLabel(userId, LOG_LABELS.CHOOSE_LEVEL),
+    });
   }
 
   @Command("ticket")
@@ -166,6 +205,8 @@ export class BotUpdate {
         return await this.registerUser(ctx);
       case BOT_ACTIONS_TYPE.CONFIRM_REALM:
         return await this.saveUserRealm(ctx, data);
+      case BOT_ACTIONS_TYPE.CHOOSE_NEXT_LEVEL:
+        return await this.confirmNextLevel(ctx, userId, data);
     }
   }
 
