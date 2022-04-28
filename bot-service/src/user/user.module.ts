@@ -8,9 +8,13 @@ import { User } from "entities/user.entity";
 import { UserController } from "./user.controller";
 import { UserService } from "./user.service";
 import { UserV2 } from "entities/userv2.entity";
+import { VoicesForBoys } from "entities/voices.boys.entity";
+import { VoicesForGirls } from "entities/voices.girls.entity";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, UserV2])],
+  imports: [
+    TypeOrmModule.forFeature([User, UserV2, VoicesForGirls, VoicesForBoys]),
+  ],
   controllers: [UserController],
   providers: [UserService],
 })
