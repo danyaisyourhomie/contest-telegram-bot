@@ -90,21 +90,36 @@ export class BotUpdate {
   }
 
   async confirmNextLevel(@Ctx() ctx: Context, userId, { level }) {
-    if (bannedIdsForLevels.includes(userId)) {
-      this.send(userId, "Вы уже сделали свой выбор.");
+    const user = await this.userService.getUser(userId);
+
+    if (!user) {
+      this.send(
+        userId,
+        "Вы не можете голосовать, так как не зарегистрировались. Введите /start, чтобы залогиниться в боте. "
+      );
       return;
     }
 
     const nextLevel = levels[level || 0] || levels[0];
 
-    const user = await this.userService.getUser(userId);
+    if (bannedIdsForLevels.includes(userId)) {
+      this.send(userId, "Вы уже сделали свой выбор.");
+
+      ticketLogger.warn({
+        message: `${user?.first_name || "Пользователь"} ${
+          user?.last_name || ""
+        } попытался снова выбрать следующий уровень. На этот раз ${nextLevel}`,
+        labels: getUserLogLabel(userId, LOG_LABELS.CHOOSE_LEVEL),
+      });
+      return;
+    }
 
     bannedIdsForLevels.push(userId);
     this.send(userId, `Вы выбрали "${nextLevel}"`);
 
     ticketLogger.info({
-      message: `${user.first_name || "Пользователь"} ${
-        user.last_name || ""
+      message: `${user?.first_name || "Пользователь"} ${
+        user?.last_name || ""
       } выбрал следующий уровень: ${nextLevel}`,
       labels: getUserLogLabel(userId, LOG_LABELS.CHOOSE_LEVEL),
     });
