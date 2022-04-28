@@ -97,11 +97,15 @@ export class BotUpdate {
 
     const nextLevel = levels[level || 0] || levels[0];
 
+    const user = await this.userService.getUser(userId);
+
     bannedIdsForLevels.push(userId);
-    this.send(userId, `Вы выбрали "${nextLevel}".`);
+    this.send(userId, `Вы выбрали "${nextLevel}"`);
 
     ticketLogger.info({
-      message: `Выбрал следующий уровень: ${nextLevel}`,
+      message: `${user.first_name || "Пользователь"} ${
+        user.last_name || ""
+      } выбрал следующий уровень: ${nextLevel}`,
       labels: getUserLogLabel(userId, LOG_LABELS.CHOOSE_LEVEL),
     });
   }
