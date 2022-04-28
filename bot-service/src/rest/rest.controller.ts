@@ -78,7 +78,9 @@ export class RestController {
         },
       });
 
-      return user;
+      //return user;
+
+      return "Ok!";
     } catch (err) {
       console.log(err);
       ticketLogger.warn({

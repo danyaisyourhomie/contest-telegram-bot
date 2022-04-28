@@ -6,7 +6,7 @@ services:
       context: ./bot-service
       dockerfile: Dockerfile
     ports:
-      - "3100:3000"
+      - "4000:4000"
     command: npm run start
     depends_on:
       - postgres
