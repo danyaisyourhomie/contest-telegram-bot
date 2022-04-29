@@ -1,4 +1,5 @@
 import { BotUpdate } from "./bot.update";
+import { Config } from "entities/config.entity";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "entities/user.entity";
@@ -8,7 +9,13 @@ import { VoicesForBoys } from "entities/voices.boys.entity";
 import { VoicesForGirls } from "entities/voices.girls.entity";
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, UserV2, VoicesForGirls, VoicesForBoys]),
+    TypeOrmModule.forFeature([
+      User,
+      UserV2,
+      VoicesForGirls,
+      VoicesForBoys,
+      Config,
+    ]),
   ],
   providers: [BotUpdate, UserService],
 })

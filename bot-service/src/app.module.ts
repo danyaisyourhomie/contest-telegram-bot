@@ -1,3 +1,4 @@
+import { Config } from "entities/config.entity";
 import { DEV_BOT } from "const";
 import { EchoModule } from "./bot/bot.module";
 import { Module } from "@nestjs/common";
@@ -42,7 +43,7 @@ const {
       username: POSTGRES_USER,
       password: POSTGRES_PASSWORD,
       database: POSTGRES_DB,
-      entities: [User, UserV2, VoicesForGirls, VoicesForBoys],
+      entities: [User, UserV2, VoicesForGirls, VoicesForBoys, Config],
       synchronize: true,
     }),
   ],

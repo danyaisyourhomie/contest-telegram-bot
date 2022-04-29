@@ -23,6 +23,9 @@ export enum LOG_LABELS {
   EARLY_TICKET = "early-ticket",
   USER_REGISTRATION = "user-registration",
   CHOOSE_LEVEL = "choose-level",
+  VOTING = "voting",
+  VOTING_COMMAND = "voting-command",
+  VOTING_EARLY = "voting-early",
 }
 
 const QRCODE_BGCOLOR = "71868F";

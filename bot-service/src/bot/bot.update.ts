@@ -49,6 +49,38 @@ export class BotUpdate {
     private readonly userService: UserService
   ) {}
 
+  // DEFAULT COMMANDS
+
+  @Start()
+  async onStart(@Ctx() ctx) {
+    const { id: userId } = ctx.from;
+
+    botLogger.info({
+      message: "Ввёл команду /start",
+      labels: getUserLogLabel(userId, LOG_LABELS.USER_ACTION),
+    });
+
+    await this.send(
+      userId,
+      `Приветствую! Это официальный бот мероприятия "Мистер и Мисс ИТМО 2022!"\nЧтобы получить свой заветный билет на шоу, зарегистрируйтесь как зритель.`,
+      {
+        parse_mode: "HTML",
+        reply_markup: sigInKeyboard.reply_markup,
+      }
+    );
+  }
+
+  @Help()
+  async onHelp(@Ctx() ctx): Promise<string> {
+    const { id: userId } = ctx.from;
+
+    botLogger.info({
+      message: "Ввёл команду /help",
+      labels: getUserLogLabel(userId, LOG_LABELS.USER_ACTION),
+    });
+    return "Нажмите /start, чтобы начать\nНажмите /ticket, чтобы получить свой билет.";
+  }
+
   @On("callback_query")
   async onBotAction(@Ctx() ctx) {
     const { action } = JSON.parse(ctx.update.callback_query.data);
@@ -58,30 +90,15 @@ export class BotUpdate {
     await this.getBotAction(action, callback_data, ctx);
   }
 
-  async getTicket(userId: number) {
-    try {
-      const token = jwt.sign(userId, process.env.JWT_TOKEN);
-
-      ticketLogger.info({
-        message: `Билет создан`,
-        labels: getUserLogLabel(userId, LOG_LABELS.CREATE_TICKET),
-        token,
-      });
-
-      return await QRCODE_SERVICE_API(QRCODE_VALIDATION_SERVICE_HOST + token);
-    } catch (err) {
-      console.log(err);
-
-      ticketLogger.warn({
-        message: `Билет не был создан`,
-        labels: getUserLogLabel(userId, LOG_LABELS.CREATE_TICKET),
-      });
-    }
-  }
+  // NEXT LEVEL
 
   @Command("nextLevel")
   async chooseLevel(@Ctx() ctx: Context) {
     const { id } = ctx.from;
+
+    if (!(await this.checkLevels())) {
+      return "Выбор уровня закрыт";
+    }
 
     await this.send(id, `Выберите синдром:`, {
       parse_mode: "HTML",
@@ -124,6 +141,8 @@ export class BotUpdate {
       labels: getUserLogLabel(userId, LOG_LABELS.CHOOSE_LEVEL),
     });
   }
+
+  // SEND TICKET
 
   @Command("ticket")
   async sendTicket(@Ctx() ctx: Context) {
@@ -169,38 +188,206 @@ export class BotUpdate {
     }
   }
 
-  @Start()
-  async onStart(@Ctx() ctx) {
+  async getTicket(userId: number) {
+    try {
+      const token = jwt.sign(userId, process.env.JWT_TOKEN);
+
+      ticketLogger.info({
+        message: `Билет создан`,
+        labels: getUserLogLabel(userId, LOG_LABELS.CREATE_TICKET),
+        token,
+      });
+
+      return await QRCODE_SERVICE_API(QRCODE_VALIDATION_SERVICE_HOST + token);
+    } catch (err) {
+      console.log(err);
+
+      ticketLogger.warn({
+        message: `Билет не был создан`,
+        labels: getUserLogLabel(userId, LOG_LABELS.CREATE_TICKET),
+      });
+    }
+  }
+
+  // VOTE
+  @Command("vote")
+  async voteCommand(@Ctx() ctx) {
     const { id: userId } = ctx.from;
 
+    if (!(await this.checkVoting())) {
+      botLogger.warn({
+        message: `Попытался проголосовать раньше времени`,
+        labels: getUserLogLabel(userId, LOG_LABELS.VOTING_EARLY),
+      });
+      return "Голосование закрыто";
+    }
+
+    await this.send(
+      userId,
+      `>>> Голосование за кандидатов
+
+Данный процесс разделен на 2 этапа:
+
+1) Сначала нужно проголосовать за участниц (/voteGirls)
+2) потом за участников (/voteBoys)
+
+Каждая команда позволяет проголосовать за соответствующую группу участников / участниц:
+
+Девушки:
+Дарья Баева
+Мария Судакова
+Дарья Кожина
+Асия Ермолаева
+Ольга Лаухина
+
+Парни:
+Антон Алексеев
+Максим Михалевич
+Владислав Ландграф
+Рашид Галеев
+
+Вместе с командной нужно прислать баллы в соответствии с порядком выступления кандидатов:
+- от 1 до 5, голосуя за участниц
+- от 1 до 4, голосуя за участников
+
+Где 5 (4) - это самый высокий балл.
+
+При этом оценки не должны повторяться. Например:
+
+/voteGirls 1 2 3 4 5
+
+/voteBoys 4 3 2 1
+
+Пример неправильного ввода:
+
+/voteGirls 4 4 4 4 4
+/voteBoys 1 1 1 1
+
+На протяжении всего концерта вы сможете поменять своё решение, снова вызвав команды /voteGirls и /voteBoys, передав желаемые баллы.
+`
+    );
+
     botLogger.info({
-      message: "Ввёл команду /start",
-      labels: getUserLogLabel(userId, LOG_LABELS.USER_ACTION),
+      message: `Начал голосование`,
+      labels: getUserLogLabel(userId, LOG_LABELS.VOTING_COMMAND),
+    });
+  }
+
+  @Command("voteGirls")
+  async voteGirls(@Ctx() ctx) {
+    const { id: userId, first_name, second_name } = ctx.from;
+    const user = `${first_name || "Пользователь"} ${second_name || ""}`;
+
+    if (!(await this.checkVoting())) {
+      return "Голосование закрыто";
+    }
+
+    const { text } = ctx.message;
+
+    const { message: msg, scoresList } = await this.userService.extractScores(
+      text,
+      "girls",
+      userId
+    );
+
+    if (msg !== "ok") {
+      botLogger.warn({
+        message: `${user} неправильно проголосовал за девушек`,
+        msg,
+        scoresList,
+        labels: getUserLogLabel(userId, LOG_LABELS.VOTING),
+      });
+      return msg;
+    }
+
+    botLogger.info({
+      message: `${user} проголосовал за девушек`,
+      scoresList,
+      labels: getUserLogLabel(userId, LOG_LABELS.VOTING),
     });
 
     await this.send(
       userId,
-      `Приветствую! Это официальный бот мероприятия "Мистер и Мисс ИТМО 2022!"\nЧтобы получить свой заветный билет на шоу, зарегистрируйтесь как зритель.`,
-      {
-        parse_mode: "HTML",
-        reply_markup: sigInKeyboard.reply_markup,
-      }
+      `>>> Вы проставили следующие оценки:
+
+Дарья Баева - ${scoresList[0]}
+Мария Судакова - ${scoresList[1]}
+Дарья Кожина - ${scoresList[2]}
+Асия Ермолаева - ${scoresList[3]}
+Ольга Лаухина - ${scoresList[4]}
+
+Если хотите изменить своё решение, пропишите снова команду /voteGirls
+
+Если ещё не проголосовали за парней, выполните команду /voteBoys
+
+Правила голосования: /vote`
     );
   }
 
-  @Help()
-  async onHelp(@Ctx() ctx): Promise<string> {
-    const { id: userId } = ctx.from;
+  @Command("voteBoys")
+  async voteBoys(@Ctx() ctx) {
+    const { id: userId, first_name, second_name } = ctx.from;
+    const user = `${first_name || "Пользователь"} ${second_name || ""}`;
+
+    if (!(await this.checkVoting())) {
+      return "Голосование закрыто";
+    }
+
+    const { text } = ctx.message;
+
+    const { message: msg, scoresList } = await this.userService.extractScores(
+      text,
+      "boys",
+      userId
+    );
+
+    if (msg !== "ok") {
+      botLogger.warn({
+        message: `${user} неправильно проголосовал за парней`,
+        msg,
+        scoresList,
+        labels: getUserLogLabel(userId, LOG_LABELS.VOTING),
+      });
+      return msg;
+    }
 
     botLogger.info({
-      message: "Ввёл команду /help",
-      labels: getUserLogLabel(userId, LOG_LABELS.USER_ACTION),
+      message: `${user} проголосовал за парней`,
+      scoresList,
+      labels: getUserLogLabel(userId, LOG_LABELS.VOTING),
     });
-    return "Нажмите /start, чтобы начать\nНажмите /ticket, чтобы получить свой билет.";
+
+    await this.send(
+      userId,
+      `>>> Вы проставили следующие оценки:
+
+Антон Алексеев - ${scoresList[0]}
+Максим Михалевич - ${scoresList[1]}
+Владислав Ландграф - ${scoresList[2]}
+Рашид Галеев - ${scoresList[3]}
+
+Если хотите изменить своё решение, пропишите снова команду /voteBoys
+
+Если ещё не проголосовали за девушек, выполните команду /voteGirls
+
+Правила голосования: /vote`
+    );
+  }
+
+  async checkVoting() {
+    const isActive = await this.userService.isVotingActive();
+
+    return isActive;
+  }
+
+  async checkLevels() {
+    const isActive = await this.userService.isSelectingLevelsActive();
+
+    return isActive;
   }
 
   @On("text")
-  onMessage(@Ctx() ctx) {
+  async onMessage(@Ctx() ctx) {
     const { id: userId } = ctx.from;
 
     const { text } = ctx.message;
