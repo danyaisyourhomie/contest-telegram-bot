@@ -275,8 +275,8 @@ export class BotUpdate {
 
   @Command("voteGirls")
   async voteGirls(@Ctx() ctx) {
-    const { id: userId, first_name, second_name } = ctx.from;
-    const user = `${first_name || "Пользователь"} ${second_name || ""}`;
+    const { id: userId, first_name, last_name } = ctx.from;
+    const user = `${first_name || "Пользователь"} ${last_name || ""}`;
 
     if (!(await this.checkVoting())) {
       return "Голосование закрыто";
@@ -326,8 +326,8 @@ export class BotUpdate {
 
   @Command("voteBoys")
   async voteBoys(@Ctx() ctx) {
-    const { id: userId, first_name, second_name } = ctx.from;
-    const user = `${first_name || "Пользователь"} ${second_name || ""}`;
+    const { id: userId, first_name, last_name } = ctx.from;
+    const user = `${first_name || "Пользователь"} ${last_name || ""}`;
 
     if (!(await this.checkVoting())) {
       return "Голосование закрыто";
